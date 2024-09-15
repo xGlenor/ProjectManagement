@@ -1,0 +1,73 @@
+﻿@using ProjectManagement.Dtos
+@using ProjectManagement.IService
+@using Task = ProjectManagement.Models.Task
+@inject IUserService UserService;
+@inject ITaskService TaskService;
+@inject IProjectService ProjectService;
+@inject NavigationManager _navigationManager
+
+<EditForm Model="Task" OnSubmit="Edit">
+    <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Edit task</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+        <div class="mb-3">
+            <label for="firstName" class="form-label">Task name</label>
+            <InputText type="text" @bind-Value="Task.taskName" class="form-control" id="firstName"/>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <InputTextArea @bind-Value="Task.description" class="form-control" id="description"/>
+        </div>
+        <div class="mb-3">
+            <label for="project" class="form-label">Project</label>
+            <InputSelect class="form-control" @bind-Value="Task.projectId">
+                @foreach (var project in ProjectService.GetAllProjectNames())
+                {
+                <option value="@project.projectId">@project.projectName</option>
+                }
+            </InputSelect>
+        </div>
+        <div class="mb-3">
+            <label for="status" class="form-label">Status</label>
+            <InputSelect class="form-control" @bind-Value="Task.status">
+                <option value="ToDo">To do</option>
+                <option value="InProgress">In Progress</option>
+                <option value="Completed">Completed</option>
+            </InputSelect>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Priority</label>
+            <InputSelect class="form-control" @bind-Value="Task.priority">
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+            </InputSelect>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Users assigned</label>
+            <RadzenListBox @bind-Value=@Task.assignedUserId Data=@UserService.GetAllUsers() TextProperty="@nameof(UserDtos.email)" ValueProperty="@nameof(UserDtos.userId)"
+                           Multiple=true AllowClear=true Placeholder="Select users" Style="width: 100%; max-width: 400px; height: 200px"
+                           InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "select products" } })"/>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Change</button>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public Task Task { get; set; }
+    
+    private void Edit()
+    {
+        TaskService.Update(Task);
+        _navigationManager.Refresh(true);
+    }
+    
+}

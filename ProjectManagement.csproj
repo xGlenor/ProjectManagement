@@ -13,8 +13,4 @@
       <PackageReference Include="Radzen.Blazor" Version="5.1.11" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Components\Modals\" />
-    </ItemGroup>
-
 </Project>

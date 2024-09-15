@@ -1,0 +1,49 @@
+﻿@using ProjectManagement.IService
+@using ProjectManagement.Models
+@inject IUserService UserService;
+@inject NavigationManager _navigationManager
+
+<EditForm Model="User" OnSubmit="Edit">
+    <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Edit user</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="mb-3">
+            <label for="firstName" class="form-label">Firstname</label>
+            <InputText type="text" @bind-Value="User.firstName" class="form-control" id="firstName"/>
+        </div>
+        <div class="mb-3">
+            <label for="lastName" class="form-label">Lastname</label>
+            <InputText type="text" @bind-Value="User.lastName" class="form-control" id="lastName"/>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <InputText type="email" @bind-Value="User.email" class="form-control" id="email"/>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <InputText type="text" @bind-Value="User.password" class="form-control" id="password"/>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Change</button>
+    </div>
+</EditForm>
+
+
+@code {
+    
+    [Parameter]
+    public User? User { get; set; }
+    
+    private void Edit()
+    {
+        UserService.Update(User);
+        _navigationManager.Refresh(true);
+    }
+    
+}

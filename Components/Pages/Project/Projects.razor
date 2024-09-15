@@ -1,0 +1,108 @@
+﻿@page "/projects"
+@using ProjectManagement.IService
+@using ProjectManagement.Models
+@using Task = System.Threading.Tasks.Task
+@attribute [StreamRendering]
+@inject IUserService UserService;
+@inject IProjectService ProjectService;
+@inject ITaskService TaskService;
+@inject NavigationManager _navigationManager
+
+<PageTitle>Projects</PageTitle>
+
+<h1>Projects</h1>
+
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProject">
+    Add project
+</button>
+
+
+@if (!projects.Any())
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <table class="table table-striped table-hover">
+        <thead>
+        <tr>
+            <th>ProjectId</th>
+            <th>Project name</th>
+            <th>Description</th>
+            <th>Start project</th>
+            <th>End Project</th>
+            <th>Status</th>
+            <th>Manager</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var project in projects)
+        {
+            <tr>
+                <td>@project.projectId</td>
+                <td>@project.projectName</td>
+                <td>@project.description</td>
+                <td>@project.startDate</td>
+                <td>@project.endDate</td>
+                <td>@project.status</td>
+                <td>@GetUserByName(project.managerId)</td>
+                <td>
+                    <button type="button" class="btn btn-success"
+                            data-bs-toggle="modal" data-bs-target="#editProject"
+                            @onclick="() => projectEdit = project">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </button>
+                    <button type="button" class="btn btn-danger" @onclick="() => DelteProject(project.projectId)">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+<div class="modal fade" id="addProject" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <AddProject/>
+        </div>
+    </div>
+</div>
+
+@if (projectEdit != null)
+{
+    <div class="modal fade" id="editProject" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <EditProject Project="projectEdit"/>
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+    private List<Project> projects;
+    private Project? projectEdit;
+
+    protected override async Task OnInitializedAsync()
+    {
+        projects = ProjectService.GetAll();
+    }
+
+    private void DelteProject(string id)
+    {
+        ProjectService.Delete(id);
+        projects = ProjectService.GetAll();
+    }
+    
+    private string GetUserByName(string id)
+    {
+        var user = UserService.GetById(id);
+        return $"{user.firstName} {user.lastName}";
+    }
+
+}
